@@ -56,16 +56,5 @@ class VoucherController extends Controller
         return response()->json(['message' => 'Voucher berhasil dihapus']);
     }
 
-    public function import(Request $request)
-{
-    $request->validate([
-        'voucher_id' => 'required|exists:vouchers,id',
-        'file'       => 'required|mimes:xlsx,xls,csv'
-    ]);
-
-    // Mengirim voucher_id ke class Import agar token terhubung ke kategori yang benar
-    Excel::import(new \App\Imports\VoucherTokenImport($request->voucher_id), $request->file('file'));
-
-    return response()->json(['message' => 'Token berhasil di-import']);
-}
+   
 }

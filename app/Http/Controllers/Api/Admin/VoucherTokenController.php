@@ -4,14 +4,18 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\VoucherToken;
 use App\Imports\VoucherTokenImport;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Models\Voucher;
-use App\Models\VoucherToken;
 
-
-class ImportController extends Controller
+class VoucherTokenController extends Controller
 {
+    public function index() {
+        $tokens = VoucherToken::with('voucher')->get();
+        return response()->json(['data' => $tokens]);
+    }
+
+
   public function importToken(Request $request)
 {
     ini_set('max_execution_time', 12000);
@@ -20,7 +24,6 @@ class ImportController extends Controller
         'file' => 'required|file|mimes:xlsx,xls',
     ]);
 
-    // Ganti menjadi TokensImport
     $import = new VoucherTokenImport;
 
     Excel::import($import, $request->file('file'));
@@ -57,4 +60,9 @@ class ImportController extends Controller
         'failed_count'  => $failed
     ], 200);
 }
+    public function destroy($id) {
+        $token = VoucherToken::findOrFail($id);
+        $token->delete();
+        return response()->json(['message' => 'Token Berhasil Dihapus']);
+    }
 }
