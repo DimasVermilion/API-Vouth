@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Xendit\Configuration;
 use Xendit\Invoice\InvoiceApi;
 use Xendit\Invoice\CreateInvoiceRequest;
+use Carbon\Carbon;
 
 class PaymentController extends Controller
 {
@@ -220,6 +221,81 @@ public function purchaseHistory()
         'success' => true,
         'message' => 'Riwayat pembelian berhasil diambil',
         'data'    => $data
+    ]);
+}
+
+public function rekapHarian($periode = null) 
+{
+    if ($periode) {
+        $parts = explode('-', $periode);
+        $tahun = (int) $parts[0];
+        $bulan = (int) $parts[1];
+    } else {
+        $bulan = Carbon::now()->month;
+        $tahun = Carbon::now()->year;
+    }
+
+    $labels = [];
+    $counts = [];
+    $revenue = [];
+    $hariDalamBulan = Carbon::create($tahun, $bulan)->daysInMonth;
+
+    for ($day = 1; $day <= $hariDalamBulan; $day++) {
+        $stats = Transaction::whereDay('created_at', $day)
+            ->whereMonth('created_at', $bulan)
+            ->whereYear('created_at', $tahun)
+            ->where('status', 'PAID')
+            ->select(
+                DB::raw('count(*) as total_qty'),
+                DB::raw('sum(total_price) as total_money')
+            )->first();
+
+        $labels[] = $day; 
+        $counts[] = (int) $stats->total_qty;
+        $revenue[] = (float) ($stats->total_money ?? 0);
+    }
+
+    return response()->json([
+        'period' => Carbon::create($tahun, $bulan)->format('F Y'),
+        'labels' => $labels,
+        'datasets' => [
+            ['label' => 'Voucher Terjual', 'data' => $counts],
+            ['label' => 'Pendapatan', 'data' => $revenue]
+        ]
+    ]);
+}
+
+/**
+ * REKAP BULANAN (Data per bulan dalam 1 tahun)
+ * Digunakan untuk grafik batang di Vue.js
+ */
+public function rekapBulanan($tahun = null)
+{
+    $tahun = $tahun ?? Carbon::now()->year;
+    $labels = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+    $counts = [];
+    $revenue = [];
+
+    for ($m = 1; $m <= 12; $m++) {
+        $stats = Transaction::whereYear('created_at', $tahun)
+            ->whereMonth('created_at', $m)
+            ->where('status', 'PAID')
+            ->select(
+                DB::raw('count(*) as total_qty'),
+                DB::raw('sum(total_price) as total_money')
+            )->first();
+
+        $counts[] = (int) $stats->total_qty;
+        $revenue[] = (float) ($stats->total_money ?? 0);
+    }
+
+    return response()->json([
+        'year' => $tahun,
+        'labels' => $labels,
+        'datasets' => [
+            ['label' => 'Total Terjual', 'data' => $counts],
+            ['label' => 'Total Pendapatan', 'data' => $revenue]
+        ]
     ]);
 }
 }
