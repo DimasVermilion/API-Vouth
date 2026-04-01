@@ -12,6 +12,7 @@ class Voucher extends Model
     protected $fillable = [
         'name',
         'price',
+        'duration'
     ];
 
     // Relasi ke Token (untuk melihat stok)

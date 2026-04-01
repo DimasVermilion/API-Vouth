@@ -15,6 +15,7 @@ return new class extends Migration
         $table->id();
         $table->string('name'); // Nama Produk
         $table->decimal('price', 15, 2); // Harga
+        $table->integer('duration'); 
         $table->text('description')->nullable();
         $table->timestamps();
     });

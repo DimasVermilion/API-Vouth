@@ -22,7 +22,7 @@ return new class extends Migration
         
         $table->integer('total_price');
         $table->string('snap_token')->nullable(); // Token untuk buka popup Midtrans
-        $table->enum('status', ['pending', 'success', 'failed', 'expired'])->default('pending');
+        $table->enum('status', ['PENDING', 'PAID', 'FAILED', 'EXPIRED'])->default('PENDING');
         $table->timestamps();
     });
 }

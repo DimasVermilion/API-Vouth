@@ -11,11 +11,16 @@ class Transaction extends Model
         'voucher_token_id', 'total_price', 'snap_token', 'status'
     ];
 
-    public function voucher() {
-        return $this->belongsTo(Voucher::class);
-    }
+    public function voucher()
+{
+    // Pastikan foreign key di tabel transactions adalah voucher_id
+    return $this->belongsTo(Voucher::class, 'voucher_id');
+}
 
-    public function voucherToken() {
-        return $this->belongsTo(VoucherToken::class);
-    }
+public function voucherToken()
+{
+    // Pastikan foreign key di tabel transactions adalah voucher_token_id
+    return $this->belongsTo(VoucherToken::class, 'voucher_token_id');
+}
+    
 }

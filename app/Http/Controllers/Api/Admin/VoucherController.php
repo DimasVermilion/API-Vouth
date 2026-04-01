@@ -18,7 +18,7 @@ class VoucherController extends Controller
         }])->get();
 
         return response()->json([
-            'success' => true,
+            'PAID' => true,
             'data' => $vouchers
         ]);
     }
@@ -29,6 +29,7 @@ class VoucherController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
+            'duration' => 'required|integer|min:1',
         ]);
 
         if ($validator->fails()) {
@@ -38,7 +39,7 @@ class VoucherController extends Controller
         $voucher = Voucher::create($request->all());
 
         return response()->json([
-            'success' => true,
+            'PAID' => true,
             'message' => 'Jenis voucher berhasil dibuat',
             'data' => $voucher
         ], 201);

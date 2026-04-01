@@ -30,8 +30,8 @@ class VoucherTokenController extends Controller
 
     $failures = $import->failures();
     $failed   = count($failures);
-    $success  = $import->getRowCount();
-    $total    = $success + $failed;
+    $PAID  = $import->getRowCount();
+    $total    = $PAID + $failed;
 
     if ($failures->isNotEmpty()) {
         $errorData = [];
@@ -47,7 +47,7 @@ class VoucherTokenController extends Controller
         return response()->json([
             'message'       => 'Import Token selesai dengan beberapa error.',
             'total_rows'    => $total,
-            'success_count' => $success,
+            'PAID_count' => $PAID,
             'failed_count'  => $failed,
             'failures'      => $errorData
         ], 206);
@@ -56,7 +56,7 @@ class VoucherTokenController extends Controller
     return response()->json([
         'message'       => 'Import Token berhasil semua!',
         'total_rows'    => $total,
-        'success_count' => $success,
+        'PAID_count' => $PAID,
         'failed_count'  => $failed
     ], 200);
 }
